@@ -3,8 +3,6 @@ const router = express.Router();
 
 const restApiController = require("../controllers/rest.api.controller");
 
-router.post("/create", restApiController.createRestApi);
-
-router.post("/create/html", restApiController.createStaticHtml);
+router.post("/", restApiController.exampleRestApi);
 
 module.exports = router;
