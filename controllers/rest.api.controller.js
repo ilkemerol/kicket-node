@@ -30,7 +30,5 @@ exports.callStaticHtml = async function(req, res, next) {
 
 exports.exampleRestApi = async function(req, res, next) {
   var serviceResponse = await restApiService.exampleRestApi();
-  return res.status(200).json({
-    response: serviceResponse
-  });
+  return res.status(200).json(serviceResponse);
 };
