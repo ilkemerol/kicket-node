@@ -7,6 +7,4 @@ router.post("/:hash", restApiController.callRestApi);
 
 router.get("/:hash", restApiController.callRestApi);
 
-router.get("/html/:hash", restApiController.callStaticHtml);
-
 module.exports = router;

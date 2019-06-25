@@ -1,5 +1,6 @@
 const randomstring = require("randomstring");
 const fs = require("fs");
+const logger = require("../utils/kicket.logger");
 
 exports.createRestApi = async function(req) {
   var userRestApi = req.body;
@@ -9,16 +10,7 @@ exports.createRestApi = async function(req) {
     if (err) throw err;
   });
   fs.appendFileSync("./codes/" + uuid + "/" + uuid + ".js", userRestApi);
-  return uuid;
-};
-
-exports.createStaticHtml = async function(req) {
-  userFile = req.body;
-  const uuid = randomstring.generate({ length: 32, charset: "alphabetic" });
-  fs.mkdirSync("./codes/" + uuid, { recursive: true }, err => {
-    if (err) throw err;
-  });
-  fs.appendFileSync("./codes/" + uuid + "/" + uuid + ".html", userFile);
+  logger.doit("Create folder and file with UUID: " + uuid);
   return uuid;
 };
 
@@ -26,14 +18,8 @@ exports.callRestApi = async function(req) {
   const uuid = req.params.hash;
   const userRestService = require("../codes/" + uuid + "/" + uuid);
   const json = userRestService[uuid](req);
+  logger.doit("Running UUID: " + uuid);
   return json;
-};
-
-exports.callStaticHtml = async function(req) {
-  const uuid = req.params.hash;
-  return fs.readFileSync("./codes/" + uuid + "/" + uuid + ".html", {
-    encoding: "utf-8"
-  });
 };
 
 exports.exampleRestApi = async function() {
