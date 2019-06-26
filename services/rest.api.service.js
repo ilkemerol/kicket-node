@@ -5,9 +5,8 @@ const logger = require("../utils/kicket.logger");
 exports.createRestApi = async function(req) {
   var userRestApi = req.body;
   const uuid = randomstring.generate({ length: 32, charset: "alphabetic" });
-  if (userRestApi.indexOf("kicketApiUUID") > -1) {
-    userRestApi = userRestApi.replace(/kicketApiUUID/gi, uuid);
-    console.log(userRestApi);
+  if (userRestApi.indexOf("uuid") > -1) {
+    userRestApi = userRestApi.replace(/uuid/gi, uuid);
     fs.mkdirSync("./codes/" + uuid, { recursive: true }, err => {
       if (err) throw err;
     });
@@ -22,7 +21,7 @@ exports.createRestApi = async function(req) {
 
 exports.callRestApi = async function(req) {
   const uuid = req.params.hash;
-  if (!fs.existsSync("../codes/" + uuid + "/" + uuid + ".js")) {
+  if (!fs.existsSync("./codes/" + uuid + "/" + uuid + ".js")) {
     const json = {
       kicketCode: "N998",
       kicketType: "error",
@@ -58,8 +57,8 @@ exports.callRestApi = async function(req) {
 exports.exampleRestApi = async function(req) {
   const json = {
     exampleCode:
-      "/* Please, do NOT remove kicketApiUUID keyword. */\n/* You can define multiple method definition, just change _default keyword with your method name. */\n /* If you changed _default keyword, you need to send your method name in request */\n/* ex. { method: <your method name> } */" +
-      'exports.kicketApiUUID_default = (req, res, next) => { const result = { id: 1, name: "rest create servicee" } return result; }',
+      "/* Please, do NOT remove uuid keyword. */\n/* You can define multiple method definition, just change _default keyword with your method name. */\n /* If you changed _default keyword, you need to send your method name in request */\n/* ex. { method: <your method name> } */" +
+      'exports.uuid_default = (req, res, next) => { const result = { id: 1, name: "rest create servicee" } return result; }',
     exampleRequest: '{"customVariable": "myVariablea"}'
   };
   return json;
