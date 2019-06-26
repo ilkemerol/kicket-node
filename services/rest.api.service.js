@@ -5,27 +5,61 @@ const logger = require("../utils/kicket.logger");
 exports.createRestApi = async function(req) {
   var userRestApi = req.body;
   const uuid = randomstring.generate({ length: 32, charset: "alphabetic" });
-  userRestApi = userRestApi.replace("uuid", uuid);
-  fs.mkdirSync("./codes/" + uuid, { recursive: true }, err => {
-    if (err) throw err;
-  });
-  fs.appendFileSync("./codes/" + uuid + "/" + uuid + ".js", userRestApi);
-  logger.doit("Create folder and file with UUID: " + uuid);
-  return uuid;
+  if (userRestApi.indexOf("kicketApiUUID") > -1) {
+    userRestApi = userRestApi.replace(/kicketApiUUID/gi, uuid);
+    console.log(userRestApi);
+    fs.mkdirSync("./codes/" + uuid, { recursive: true }, err => {
+      if (err) throw err;
+    });
+    fs.appendFileSync("./codes/" + uuid + "/" + uuid + ".js", userRestApi);
+    logger.doit("Create folder and file with UUID: " + uuid);
+    return uuid;
+  } else {
+    logger.doit("Invalid kicket API UUID");
+    return 0;
+  }
 };
 
 exports.callRestApi = async function(req) {
   const uuid = req.params.hash;
+  if (!fs.existsSync("../codes/" + uuid + "/" + uuid + ".js")) {
+    const json = {
+      kicketCode: "N998",
+      kicketType: "error",
+      kicketMessage: "No Such File"
+    };
+    return json;
+  }
   const userRestService = require("../codes/" + uuid + "/" + uuid);
-  const json = userRestService[uuid](req);
-  logger.doit("Running UUID: " + uuid);
-  return json;
+  if (
+    !req.body.method &&
+    typeof userRestService[uuid + "_default"] === "function"
+  ) {
+    const json = userRestService[uuid + "_default"](req);
+    logger.doit("Running UUID: " + uuid + " Method: default");
+    return json;
+  } else if (
+    req.body.method &&
+    typeof userRestService[uuid + "_" + req.body.method] === "function"
+  ) {
+    const json = userRestService[uuid + "_" + req.body.method](req);
+    logger.doit("Running UUID: " + uuid + " Method: " + req.body.method);
+    return json;
+  } else {
+    const json = {
+      kicketCode: "N999",
+      kicketType: "error",
+      kicketMessage: "No Such Method Define"
+    };
+    return json;
+  }
 };
 
-exports.exampleRestApi = async function() {
+exports.exampleRestApi = async function(req) {
   const json = {
     exampleCode:
-      'exports.uuid = (req, res, next) => { const result = { id: 1, name: "rest create servicee" } return result; }',
+      "/* Please, do NOT remove kicketApiUUID keyword. */\n/* You can define multiple method definition, just change _default keyword with your method name. */\n /* If you changed _default keyword, you need to send your method name in request */\n/* ex. { method: <your method name> } */" +
+      'exports.kicketApiUUID_default = (req, res, next) => { const result = { id: 1, name: "rest create servicee" } return result; }',
     exampleRequest: '{"customVariable": "myVariablea"}'
   };
   return json;
