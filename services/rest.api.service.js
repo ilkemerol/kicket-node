@@ -39,7 +39,7 @@ exports.callRestApi = async function(req) {
   setTimeout(function() {
     forked.kill();
     logger.doit("Kicket try to kill child process.");
-  }, 1000);
+  }, 5000);
   return new Promise(function(resolve, reject) {
     forked.on("message", message => {
       resolve(message);
