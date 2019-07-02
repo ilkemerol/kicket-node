@@ -1,6 +1,9 @@
 const randomstring = require("randomstring");
 const fs = require("fs");
+const path = require("path");
 const logger = require("../utils/kicket.logger");
+
+const { fork } = require("child_process");
 
 exports.createRestApi = async function(req) {
   var userRestApi = req.body;
@@ -29,32 +32,29 @@ exports.callRestApi = async function(req) {
     };
     return json;
   }
-  const userRestService = require("../codes/" + uuid + "/" + uuid);
-  if (
-    !req.body.method &&
-    typeof userRestService[uuid + "_default"] === "function"
-  ) {
-    const json = userRestService[uuid + "_default"](req);
-    logger.doit("Running UUID: " + uuid + " Method: default");
-    return json;
-  } else if (
-    req.body.method &&
-    typeof userRestService[uuid + "_" + req.body.method] === "function"
-  ) {
-    const json = userRestService[uuid + "_" + req.body.method](req);
-    logger.doit("Running UUID: " + uuid + " Method: " + req.body.method);
-    return json;
-  } else {
-    const json = {
-      kicketCode: "N999",
-      kicketType: "error",
-      kicketMessage: "No Such Method Define"
-    };
-    return json;
-  }
+  logger.doit("Running UUID: " + uuid + " Method: default");
+  var root = path.dirname(require.main.filename);
+  const forked = fork(root + "/worker/worker.layer.js");
+  forked.send({ body: req.body, uuid: uuid });
+  setTimeout(function() {
+    forked.kill();
+  }, 1000);
+  return new Promise(function(resolve, reject) {
+    forked.on("message", message => {
+      resolve(message);
+    });
+    forked.on("exit", message => {
+      const json = {
+        timeout: true,
+        code: "N777",
+        message: "We believe, you can decrease your complexity."
+      };
+      resolve(json);
+    });
+  });
 };
 
-exports.exampleRestApi = async function(req) {
+exports.exampleRestApi = function(req) {
   const json = {
     exampleCode:
       "/* Please, do NOT remove uuid keyword. */\n/* You can define multiple method definition, just change _default keyword with your method name. */\n /* If you changed _default keyword, you need to send your method name in request */\n/* ex. { method: <your method name> } */" +
