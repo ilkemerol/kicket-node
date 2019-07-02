@@ -38,7 +38,8 @@ exports.callRestApi = async function(req) {
   forked.send({ body: req.body, uuid: uuid });
   setTimeout(function() {
     forked.kill();
-  }, 1000);
+    logger.doit("Kicket try to kill child process.");
+  }, 5000);
   return new Promise(function(resolve, reject) {
     forked.on("message", message => {
       resolve(message);
@@ -49,6 +50,7 @@ exports.callRestApi = async function(req) {
         code: "N777",
         message: "We believe, you can decrease your complexity."
       };
+      logger.doit("Your done bro, rest in peace.");
       resolve(json);
     });
   });
