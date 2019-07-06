@@ -63,3 +63,23 @@ exports.exampleRestApi = async function(req) {
   };
   return json;
 };
+
+exports.existRestApi = async function(req) {
+  const uuid = req.params.hash;
+  if (!fs.existsSync("./codes/" + uuid + "/" + uuid + ".js")) {
+    const json = {
+      kicketCode: "N998",
+      kicketType: "error",
+      kicketMessage: "No Such File"
+    };
+    return json;
+  }
+  let code = fs.readFileSync("./codes/" + uuid + "/" + uuid + ".js", {
+    encoding: "utf-8"
+  });
+  let json = {
+    code: code,
+    platform: "node"
+  };
+  return json;
+};
