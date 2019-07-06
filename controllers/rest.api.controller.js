@@ -21,3 +21,8 @@ exports.exampleRestApi = async function(req, res, next) {
   var serviceResponse = await restApiService.exampleRestApi();
   return res.status(200).json(serviceResponse);
 };
+
+exports.existRestApi = async function(req, res, next) {
+  var serviceResponse = await restApiService.existRestApi(req);
+  return res.status(200).json(serviceResponse);
+};
