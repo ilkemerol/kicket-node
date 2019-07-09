@@ -32,6 +32,7 @@ exports.getAllFiles = () => {
 };
 
 exports.pushFile = uuid => {
+  logger.doit("Push file to remote.");
   require("simple-git")("./codes")
     .add("./*")
     .commit("Auto commit, " + uuid)
