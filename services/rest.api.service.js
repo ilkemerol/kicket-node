@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const logger = require("../utils/kicket.logger");
 
+const gitService = require("../services/git.service");
 const { fork } = require("child_process");
 
 exports.createRestApi = async function(req) {
@@ -15,6 +16,7 @@ exports.createRestApi = async function(req) {
     });
     fs.appendFileSync("./codes/" + uuid + "/" + uuid + ".js", userRestApi);
     logger.doit("Create folder and file with UUID: " + uuid);
+    gitService.pushFile(uuid);
     return uuid;
   } else {
     logger.doit("Invalid kicket API UUID");

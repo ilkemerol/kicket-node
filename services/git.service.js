@@ -1,18 +1,42 @@
 const fs = require("fs");
-const simpleGit = require("simple-git")("./git-code");
+const dotenv = require("dotenv");
+const rmdirRecursiveSync = require("rmdir-recursive").sync;
 const simpleGitPromise = require("simple-git/promise");
+const logger = require("../utils/kicket.logger");
 
-const TOKEN = "TOKEN";
-const URL = "URL";
-const REPO = "https://" + TOKEN + ":x-oauth-basic@" + URL;
+dotenv.config();
+
+const REPO = process.env.GIT_SAFE_URL;
 
 exports.getAllFiles = () => {
-  if (fs.existsSync("./git-code")) {
-    console.log("asdasd");
+  if (fs.existsSync("./codes")) {
+    logger.doit("codes folder is exist, deleting ...");
+    rmdirRecursiveSync("./codes");
+    simpleGitPromise()
+      .silent(true)
+      .clone(REPO, "./codes", ["--branch", "node"])
+      .then(logger.doit("All user's code clone in codes folder."))
+      .catch(err =>
+        logger.doit("Something went wrong during cloning, detail: " + err)
+      );
+  } else {
+    logger.doit("codes folder is not exist, create and clone ...");
+    simpleGitPromise()
+      .silent(true)
+      .clone(REPO, "./codes", ["--branch", "node"])
+      .then(logger.doit("All user's code clone in codes folder."))
+      .catch(err =>
+        logger.doit("Something went wrong during cloning, detail: " + err)
+      );
   }
-  simpleGitPromise()
-    .silent(true)
-    .clone(REPO, "./git-code", ["--branch", "BRANCH"])
-    .then(() => console.log("finished"))
-    .catch(err => console.error("failed:", err));
+};
+
+exports.pushFile = uuid => {
+  require("simple-git")("./codes")
+    .add("./*")
+    .commit("Auto commit, " + uuid)
+    .addRemote("git-node", REPO)
+    .push(["-u", "git-node", "node"], () =>
+      logger.doit("User code committed.")
+    );
 };
