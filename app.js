@@ -7,6 +7,10 @@ const createRestApiRoute = require("./routes/create.rest.api.route");
 const callRestApiRoute = require("./routes/call.rest.api.route");
 const exampleApiRoute = require("./routes/example.rest.api.route");
 
+const gitService = require("./services/git.service");
+
+gitService.getAllFiles();
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(bodyParser.text());
