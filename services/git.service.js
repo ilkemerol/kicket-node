@@ -34,6 +34,8 @@ exports.getAllFiles = () => {
 exports.pushFile = uuid => {
   logger.doit("Push file to remote.");
   require("simple-git")("./codes")
+    .addConfig("user.name", "ilkemerol")
+    .addConfig("user.email", "ilkem.erol@hotmail.com")
     .add("./*")
     .commit("Auto commit, " + uuid)
     .addRemote("git-node", REPO)
