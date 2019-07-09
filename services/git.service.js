@@ -19,6 +19,9 @@ exports.getAllFiles = () => {
       .catch(err =>
         logger.doit("Something went wrong during cloning, detail: " + err)
       );
+    fs.readdirSync("./codes").forEach(file => {
+      console.log(file);
+    });
   } else {
     logger.doit("codes folder is not exist, create and clone ...");
     simpleGitPromise()
@@ -29,15 +32,15 @@ exports.getAllFiles = () => {
         logger.doit("Something went wrong during cloning, detail: " + err)
       );
   }
-  fs.readdirSync("./codes").forEach(file => {
-    console.log(file);
-  });
 };
 
 exports.pushFile = uuid => {
+  fs.readdirSync("./codes").forEach(file => {
+    console.log(file);
+  });
   logger.doit("Push file to remote.");
-  require("simple-git")("../codes")
-    .add("./codes/" + uuid + "/" + uuid + ".js")
+  require("simple-git")("./codes")
+    .add("./*")
     .commit("Auto commit, " + uuid)
     .addRemote("git-node", REPO)
     .push(["-u", "git-node", "node"], () =>
