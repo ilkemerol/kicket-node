@@ -32,7 +32,7 @@ exports.getAllFiles = () => {
 };
 
 exports.pushFile = uuid => {
-  logger.doit("Push file to remote.");
+  logger.doit("Kicket try to push file to remote kicket repository.");
   require("simple-git")("./codes")
     .addConfig("user.name", "ilkemerol")
     .addConfig("user.email", "ilkem.erol@hotmail.com")
@@ -40,6 +40,6 @@ exports.pushFile = uuid => {
     .commit("Auto commit, " + uuid)
     .addRemote("git-node", REPO)
     .push(["-u", "git-node", "node"], () =>
-      logger.doit("User code committed.")
+      logger.doit("Kicket successfully committed user file.")
     );
 };
