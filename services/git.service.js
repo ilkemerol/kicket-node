@@ -29,11 +29,15 @@ exports.getAllFiles = () => {
         logger.doit("Something went wrong during cloning, detail: " + err)
       );
   }
+  fs.readdirSync("./codes").forEach(file => {
+    console.log(file);
+  });
 };
 
 exports.pushFile = uuid => {
-  require("simple-git")("./codes")
-    .add("./*")
+  logger.doit("Push file to remote.");
+  require("simple-git")("../codes")
+    .add("./codes/" + uuid + "/" + uuid + ".js")
     .commit("Auto commit, " + uuid)
     .addRemote("git-node", REPO)
     .push(["-u", "git-node", "node"], () =>
