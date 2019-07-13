@@ -1,27 +1,23 @@
 const randomstring = require("randomstring");
 const fs = require("fs");
+const dotenv = require("dotenv");
 const path = require("path");
 const logger = require("../utils/kicket.logger");
 
 const gitService = require("../services/git.service");
 const { fork } = require("child_process");
+const workerTimeout = process.env.WORKER_TO;
 
 exports.createRestApi = async function(req) {
   var userRestApi = req.body;
   const uuid = randomstring.generate({ length: 32, charset: "alphabetic" });
-  if (userRestApi.indexOf("uuid") > -1) {
-    userRestApi = userRestApi.replace(/uuid/gi, uuid);
-    fs.mkdirSync("./codes/" + uuid, { recursive: true }, err => {
-      if (err) throw err;
-    });
-    fs.appendFileSync("./codes/" + uuid + "/" + uuid + ".js", userRestApi);
-    logger.doit("Create folder and file with UUID: " + uuid);
-    gitService.pushFile(uuid);
-    return uuid;
-  } else {
-    logger.doit("Invalid kicket API UUID");
-    return 0;
-  }
+  fs.mkdirSync("./codes/" + uuid, { recursive: true }, err => {
+    if (err) throw err;
+  });
+  fs.appendFileSync("./codes/" + uuid + "/" + uuid + ".js", userRestApi);
+  logger.doit("Create folder and file with UUID: " + uuid);
+  gitService.pushFile(uuid);
+  return uuid;
 };
 
 exports.callRestApi = async function(req) {
@@ -34,14 +30,14 @@ exports.callRestApi = async function(req) {
     };
     return json;
   }
-  logger.doit("Running UUID: " + uuid + " Method: default");
+  logger.doit("Creating child process for, " + uuid);
   var root = path.dirname(require.main.filename);
   const forked = fork(root + "/worker/worker.layer.js");
   forked.send({ body: req.body, uuid: uuid });
   setTimeout(function() {
     forked.kill();
     logger.doit("Kicket try to kill child process.");
-  }, 5000);
+  }, workerTimeout);
   return new Promise(function(resolve, reject) {
     forked.on("message", message => {
       resolve(message);
@@ -61,9 +57,9 @@ exports.callRestApi = async function(req) {
 exports.exampleRestApi = function(req) {
   const json = {
     exampleCode:
-      "/* Please, do NOT remove uuid keyword. */\n/* You can define multiple method definition, just change _default keyword with your method name. */\n /* If you changed _default keyword, you need to send your method name in request */\n/* ex. { method: <your method name> } */" +
-      'exports.uuid_default = (req, res, next) => { const result = { id: 1, name: "rest create servicee" } return result; }',
-    exampleRequest: '{"customVariable": "myVariablea"}'
+      "/* You can define multiple method definition, just change <default> keyword with your method name. */\n /* If you changed <default> keyword, you need to send your method name in request */\n/* ex. { method: <your method name> } */" +
+      'exports.default = (req, res, next) => { const result = { id: 1, name: "rest create servicee" } return result; }',
+    exampleRequest: '{"customVariable": "myVariable"}'
   };
   return json;
 };
