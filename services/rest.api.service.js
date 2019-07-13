@@ -57,9 +57,9 @@ exports.callRestApi = async function(req) {
 exports.exampleRestApi = function(req) {
   const json = {
     exampleCode:
-      "/* Please, do NOT remove uuid keyword. */\n/* You can define multiple method definition, just change _default keyword with your method name. */\n /* If you changed _default keyword, you need to send your method name in request */\n/* ex. { method: <your method name> } */" +
-      'exports.uuid_default = (req, res, next) => { const result = { id: 1, name: "rest create servicee" } return result; }',
-    exampleRequest: '{"customVariable": "myVariablea"}'
+      "/* You can define multiple method definition, just change <default> keyword with your method name. */\n /* If you changed <default> keyword, you need to send your method name in request */\n/* ex. { method: <your method name> } */" +
+      'exports.default = (req, res, next) => { const result = { id: 1, name: "rest create servicee" } return result; }',
+    exampleRequest: '{"customVariable": "myVariable"}'
   };
   return json;
 };
