@@ -38,7 +38,7 @@ exports.pushFile = uuid => {
   require("simple-git")("./codes")
     .addConfig("user.name", "ilkemerol")
     .addConfig("user.email", "ilkem.erol@hotmail.com")
-    .add("./" + uuid)
+    .add("./" + uuid + "/*")
     .commit("Auto commit, " + uuid)
     .addRemote("git-node", REPO)
     .push(["-u", "git-node", "node"], () =>
